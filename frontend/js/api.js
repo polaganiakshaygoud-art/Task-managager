@@ -2,7 +2,10 @@
 //  API & WebSocket client
 // ============================================================
 
-const BASE_URL = 'http://localhost:3000/api';
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+// In production, change this to your deployed backend URL (e.g. 'https://task-manager-backend.onrender.com')
+const BACKEND_URL = isLocal ? 'http://localhost:3000' : 'https://YOUR_BACKEND_URL';
+const BASE_URL = `${BACKEND_URL}/api`;
 let wsConnection = null;
 let wsHandlers = {};
 
@@ -147,7 +150,8 @@ function connectWS(handlers = {}) {
   if (!token) return;
 
   wsHandlers = handlers;
-  const wsUrl = `ws://localhost:3000?token=${encodeURIComponent(token)}`;
+  const wsProtocol = BACKEND_URL.startsWith('https') ? 'wss' : 'ws';
+  const wsUrl = `${wsProtocol}://${BACKEND_URL.replace(/^https?:\/\//, '')}?token=${encodeURIComponent(token)}`;
   wsConnection = new WebSocket(wsUrl);
 
   wsConnection.onopen = () => {
